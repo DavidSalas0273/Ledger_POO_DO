@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: transaction-processor
+  main:
+    keep-alive: true
+    web-application-type: none
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5433}/${POSTGRES_DB:ledger}
+    username: ${POSTGRES_USER:ledger}
+    password: ${POSTGRES_PASSWORD:ledger}
+    hikari:
+      maximum-pool-size: 5
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+  # RabbitMQ: conexión al broker (host, puerto y credenciales)
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:ledger}
+    password: ${RABBITMQ_PASSWORD:ledger}
+    listener:
+      simple:
+        prefetch: 1
+        concurrency: 1
+        default-requeue-rejected: false
+  # Kafka: conexión al broker y serializadores de los mensajes
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+    consumer:
+      group-id: transaction-processor
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+ledger:
+  # RabbitMQ: nombres de las colas
+  rabbit:
+    transfer-queue: transfer_commands
+  # Kafka: nombres de los topics
+  kafka:
+    transactions-topic: transactions_log
+    fraud-alerts-topic: fraud_alerts
+  cuentas:
+    saldo-inicial: ${LEDGER_SALDO_INICIAL:0}
+    divisa-base: USD
+  reglas:
+    limite-por-transaccion: ${LEDGER_LIMITE_TRANSACCION:1000000}

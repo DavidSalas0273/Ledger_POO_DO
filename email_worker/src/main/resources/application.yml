@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: email-worker
+  main:
+    keep-alive: true
+    web-application-type: none
+  # RabbitMQ: conexión al broker (host, puerto y credenciales)
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:ledger}
+    password: ${RABBITMQ_PASSWORD:ledger}
+    listener:
+      simple:
+        prefetch: 1
+        concurrency: 1
+        default-requeue-rejected: false
+
+ledger:
+  # RabbitMQ: nombres de las colas
+  rabbit:
+    email-queue: email_queue
+  email:
+    latencia-simulada-ms: ${EMAIL_SIMULATED_LATENCY_MS:500}
